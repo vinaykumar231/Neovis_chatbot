@@ -11,6 +11,7 @@ from database import get_db
 from ..schemas import QueryRequest, IDValidationRequest
 from chroma_Vector_db.chroma import collection, model, client
 from ..models.chabot import query_similar_documents
+from auth.auth_bearer import JWTBearer, get_current_user
 
 
 load_dotenv()
@@ -25,7 +26,7 @@ system_prompt = """ Persona: You are a helpful assistant. Based on the following
 Task: Answer all questions about services and related information. Provide detailed and kind responses in a conversational manner.
 """
 
-@router.post("/chatbot_response/")
+@router.post("/chatbot_response/", dependencies=[Depends(JWTBearer()), Depends(get_current_user)])
 async def query_documents(data: QueryRequest, db: Session = Depends(get_db)):
     try:
         query_text = data.query
@@ -51,14 +52,3 @@ async def query_documents(data: QueryRequest, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected Error: {str(e)}")
  
-# @router.post("/validate-id")
-# async def validate_id(request: IDValidationRequest):
-#     collection_id = str(request.id)  # Ensure the ID is treated as a string
-#     collection = client.get_collection(name=f"collection_{collection_id}")
-
-#     if not collection:
-#         raise HTTPException(status_code=404, detail="Collection ID not found")
-
-#     return {"message": "Collection ID is valid"}
-
-

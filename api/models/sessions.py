@@ -4,30 +4,21 @@ from database import Base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import enum
+from api.schemas import UserType, SessionStatusEnum
 
-
-class UserType(str, enum.Enum):
-    register = "register"
-    internal = "internal"
-    guest = "guest"
-
-class SessionStatusEnum(enum.Enum):
-    active = "active"
-    closed = "closed"
-    transferred = "transferred"
 
 class Session(Base):
     __tablename__ = 'sessions'
     
-    session_id = Column(String(50), primary_key=True, index=True, nullable=False)
-    user_id = Column(String(50), ForeignKey('users.user_id'), nullable=False)
+    session_id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.user_id'))
     user_type = Column(Enum(UserType), nullable=False)
     status = Column(Enum(SessionStatusEnum), default=SessionStatusEnum.active, nullable=False)
     started_at = Column(TIMESTAMP, default=datetime.utcnow, nullable=False)
-    ended_at = Column(TIMESTAMP, nullable=True)
+    ended_at = Column(DateTime, default=func.now())
 
     user = relationship('NeovisChatbotUsers', back_populates='sessions')
-     
-    chats = relationship('ChatBot', back_populates='session')  
-
+    chats = relationship('ChatBot', back_populates='session')
     chat_transfers = relationship('ChatTransfer', back_populates='session')
+
+    

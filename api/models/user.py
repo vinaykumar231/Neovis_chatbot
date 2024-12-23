@@ -22,15 +22,14 @@ class NeovisChatbotUsers(Base):
 
     user_id = Column(Integer, primary_key=True, autoincrement=True)
     Task_id = Column(Integer, nullable=True)
-    user_name = Column(String(255))
-    user_email = Column(String(255), unique=True)
-    user_password = Column(String(255))
+    user_email = Column(String(255))
     user_type = Column(String(100))
-    phone_no = Column(BIGINT)
-    register_at = Column(DateTime, default=func.now())
-    login_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.current_timestamp())
-   
+    user_password = Column(String(255))
+    login_at = Column(DateTime, default=func.now())
+    
     sessions = relationship('Session', back_populates='user')
+    
+    chat_transfers = relationship('ChatTransfer', back_populates='transferred_by_user')
 
     # #######################################################################################################################
     @staticmethod

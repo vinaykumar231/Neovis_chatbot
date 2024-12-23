@@ -4,28 +4,20 @@ from sqlalchemy import TEXT, Column, Enum, Integer, String, ForeignKey,Text, Dat
 from database import Base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+from api.schemas import SenderEnum, MessageStatusEnum
 
-
-class SenderEnum(enum.Enum):
-    user = "user"
-    bot = "bot"
-    agent = "agent"
-
-class MessageStatusEnum(enum.Enum):
-    unread = "unread"
-    read = "read"
 
 class ChatBot(Base):
     __tablename__ = 'chatbots'
     
-    chat_id = Column(String(50), primary_key=True, index=True, nullable=False)
-    session_id = Column(String(50), ForeignKey('sessions.session_id'), nullable=False)
+    chat_id = Column(Integer, primary_key=True, autoincrement=True)
+    session_id = Column(Integer, ForeignKey('sessions.session_id'), nullable=False)
     sender = Column(Enum(SenderEnum), nullable=False)
     message = Column(TEXT, nullable=False)
     sent_at = Column(TIMESTAMP, default=datetime.utcnow, nullable=False)
     status = Column(Enum(MessageStatusEnum), default=MessageStatusEnum.unread, nullable=False)
     
-    session = relationship('Session', back_populates='chats')
+    session = relationship('Session', back_populates='chats')  
 
 
 
